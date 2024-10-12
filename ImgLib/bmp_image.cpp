@@ -68,7 +68,8 @@ bool SaveBMP(const Path& file, const Image& image) {
     if (!ofs) return false;
 
     int height = image.GetHeight();
-    int width = image.GetWidth();
+    int width = image.GetWidth();    
+    if (height <= 0 || width <= 0) return false; 
     int bmp_stride = GetBMPStride(width);
 
     BitmapFileHeader bitmap_file_header;
@@ -110,20 +111,20 @@ Image LoadBMP(const Path& file) {
 
     Image result(bitmap_info_header.image_width, bitmap_info_header.image_height, Color::Black());
     int height = result.GetHeight();
-    int width = result.GetWidth();
+    int width = result.GetWidth();   
     int bmp_stride = GetBMPStride(width);
 
     vector<char> buffer(bmp_stride);
     for (int y = height - 1; y >= 0; y--) {
         auto line = result.GetLine(y);
         ifs.read(buffer.data(), bmp_stride);
-
         for (int x = 0; x < width; ++x) {
             line[x].b = static_cast<byte>(buffer[x * 3 + 0]);
             line[x].g = static_cast<byte>(buffer[x * 3 + 1]);
             line[x].r = static_cast<byte>(buffer[x * 3 + 2]);
         }
     }
+    
     return result;
 }
 
